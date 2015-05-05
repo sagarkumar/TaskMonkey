@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.http.HttpEntity;
@@ -36,84 +37,91 @@ import android.widget.TextView;
 public class MyTask extends Fragment {
 
 	String[] menutitles;
-    TypedArray menuIcons;
+	TypedArray menuIcons;
 
-    CustomAdapter adapter;
-    private List<RowItem> rowItems;
+	CustomAdapter adapter;
+	private List<RowItem> rowItems;
 
-    private class AsyncListViewLoader extends AsyncTask<String, Void, /*List<RowItem>*/ String> {
-         
-        @Override
-        protected void onPostExecute(String result) {           
-            super.onPostExecute(result);
-            //adapter.setItemList(result);
-            //adapter.notifyDataSetChanged();
-        }
-     
-        @Override
-        protected void onPreExecute() {       
-            super.onPreExecute();        
-        }
-     
-        @Override
-        protected String doInBackground(String... params) {
-            List<RowItem> result = new ArrayList<RowItem>();
-             
-            String response = "";
-            for (String url : params) {
-              DefaultHttpClient client = new DefaultHttpClient();
-              HttpGet httpGet = new HttpGet(url);
-              try {
-                HttpResponse execute = client.execute(httpGet);
-                InputStream content = execute.getEntity().getContent();
+	private class AsyncListViewLoader extends
+			AsyncTask<String, Void, List<RowItem>> {
 
-                BufferedReader buffer = new BufferedReader(new InputStreamReader(content));
-                String s = "";
-                while ((s = buffer.readLine()) != null) {
-                  response += s;
-                }
+		@Override
+		protected void onPostExecute(List<RowItem> result) {
+			super.onPostExecute(result);
+			adapter.setItemList(result);
+			adapter.notifyDataSetChanged();
+		}
 
-                //JSONObject obj = new JSONObject(s);
-                
-              } catch (Exception e) {
-                e.printStackTrace();
-              }
-            }
-            return response;
-        }
-         
-        private RowItem convertContact(JSONObject obj) throws JSONException {
-            String name = "sagar";
-            return new RowItem(name , R.drawable.ic_launcher);
-        }
-         
-    }
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+		}
 
+		@Override
+		protected List<RowItem> doInBackground(String... params) {
+			List<RowItem> result = new ArrayList<RowItem>();
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-    	
-    		View android = inflater.inflate(R.layout.my_task, container, false);
-        	ListView yourListView = (ListView) android.findViewById(R.id.list);
-        	
-        	//menutitles = getResources().getStringArray(R.array.titles);
-           // menuIcons = getResources().obtainTypedArray(R.array.icons);
+			String response = "";
+			for (String url : params) {
+				DefaultHttpClient client = new DefaultHttpClient();
+				HttpGet httpGet = new HttpGet(url);
+				try {
+					HttpResponse execute = client.execute(httpGet);
+					InputStream content = execute.getEntity().getContent();
 
-            rowItems = new ArrayList<RowItem>();
+					BufferedReader buffer = new BufferedReader(
+							new InputStreamReader(content));
+					String s = "";
+					while ((s = buffer.readLine()) != null) {
+						response += s;
+					}
 
-           //  for (int i = 0; i < menutitles.length; i++) {
-            //     RowItem items = new RowItem(menutitles[i], menuIcons.getResourceId(
-             //            i, -1));
+					// JSONObject obj = new JSONObject(s);
 
-              //   rowItems.add(items);
-            // }
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			
+			try {
+				JSONArray array = new JSONArray(response);
+				
+				 for (int i = 0 ; i < array.length(); i++) {
+				        JSONObject obj = array.getJSONObject(i);
+				        String A = obj.getString("taskId");
+				        String B = obj.getString("taskName");
+				        String C = obj.getString("assignedTo");
+				        Log.d("------------",A + " " + B + " " + C);
+				    }
+				
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
 
-             adapter = new CustomAdapter(getActivity(), rowItems);
-             
-             yourListView.setAdapter(adapter);
-             (new AsyncListViewLoader()).execute("http://10.252.244.19:8020/users/rucha@jedix.com/tasks?taskType=ASSIGNED_TO_ME&completed=false");
-        	 return android;	
-    }
+			
+			return result;
+		}
+
+		private RowItem convertContact(JSONObject obj) throws JSONException {
+			String name = "sagar";
+			return new RowItem(name, R.drawable.ic_launcher);
+		}
+
+	}
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+
+		View android = inflater.inflate(R.layout.my_task, container, false);
+		ListView yourListView = (ListView) android.findViewById(R.id.list);
+		rowItems = new ArrayList<RowItem>();
+		adapter = new CustomAdapter(getActivity(), rowItems);
+
+		yourListView.setAdapter(adapter);
+		(new AsyncListViewLoader())
+				.execute("http://10.252.244.19:8020/taskmonkey/users/test@test.com/tasks?taskType=ALL&completed=false");
+		return android;
+	}
 
 }
