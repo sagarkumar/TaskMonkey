@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array
+        name="titles">
+        <item
+            >Sagar</item>
+    </string-array>
+    
+    <string-array
+        name="icons">
+        <item
+            >ic_launcher</item>
+    </string-array>
+</resources>
