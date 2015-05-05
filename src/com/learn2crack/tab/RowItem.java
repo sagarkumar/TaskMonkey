@@ -57,20 +57,32 @@ public class RowItem implements Serializable  {
         return projectId;
     }
     
-    public String get() {
-        return title;
+    public String getAssignedTo() {
+        return assignedTo;
     }
     
-    public String getTitle() {
-        return title;
+    public String getPlannedCompletionDate() {
+        return plannedCompletionDate;
     }
     
-    public String getTitle() {
-        return title;
+    public String getCompletionDate() {
+        return completionDate;
     }
 
-    public int getIcon() {
-        return icon;
+    public String getAddedOn() {
+        return addedOn;
+    }
+    
+    public int getNameIcon() {
+        return nameIcon;
+    }
+    
+    public int getDelIcon() {
+        return delIcon;
+    }
+    
+    public int getDoneIcon() {
+        return doneIcon;
     }
 
 
